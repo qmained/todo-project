@@ -1,0 +1,13 @@
+{
+  "reflection": [
+    {
+      "type": "java.time.OffsetDateTime",
+      "allDeclaredConstructors": true,
+      "allPublicConstructors": true,
+      "allDeclaredMethods": true,
+      "allPublicMethods": true,
+      "allDeclaredFields": true,
+      "allPublicFields": true
+    }
+  ]
+}

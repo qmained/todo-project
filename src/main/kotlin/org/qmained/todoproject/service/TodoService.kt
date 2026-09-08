@@ -1,11 +1,13 @@
 package org.qmained.todoproject.service
 
+import com.github.benmanes.caffeine.cache.AsyncCache
 import kotlinx.coroutines.flow.toList
 import org.qmained.todoproject.exceptions.TodoNotFound
 import org.qmained.todoproject.mapper.TodoMapper
 import org.qmained.todoproject.models.dto.TodoDto
 import org.qmained.todoproject.models.entity.TodoModel
 import org.qmained.todoproject.repository.TodoRepository
+import org.qmained.todoproject.utils.getOrPut
 import org.springframework.data.redis.core.ReactiveRedisTemplate
 import org.springframework.data.redis.core.deleteAndAwait
 import org.springframework.data.redis.core.getAndAwait
@@ -18,7 +20,9 @@ import java.util.*
 class TodoService(
     private val todoRepository: TodoRepository,
     private val todoMapper: TodoMapper,
-    redisTemplate: ReactiveRedisTemplate<String, Any>
+    private val todoAsyncCache: AsyncCache<UUID, TodoModel>,
+    redisTemplate: ReactiveRedisTemplate<String, Any>,
+
 ) {
     private val valueOps = redisTemplate.opsForValue()
 
@@ -41,14 +45,15 @@ class TodoService(
     }
 
     suspend fun getById(id: UUID): TodoModel? {
-        val cacheKey = "todo:$id"
-        val cachedModel = valueOps.getAndAwait(cacheKey) as? TodoModel
-        if (cachedModel != null) {
-            return cachedModel
+//        val cacheKey = "todo:$id"
+//        val cachedModel = valueOps.getAndAwait(cacheKey) as? TodoModel
+//        if (cachedModel != null) {
+//            return cachedModel
+//        }
+        return todoAsyncCache.getOrPut(id) { uuid ->
+            todoRepository.findById(uuid) ?: throw TodoNotFound(id)
         }
-        val model = todoRepository.findById(id) ?: throw TodoNotFound(id)
-        valueOps.setAndAwait(cacheKey, model, Expiration.seconds(60))
-        return model
+//        valueOps.setAndAwait(cacheKey, model, Expiration.seconds(60))
     }
 
     suspend fun delete(id: UUID) {

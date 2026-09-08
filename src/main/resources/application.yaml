@@ -5,6 +5,9 @@ spring:
     url: r2dbc:postgresql://localhost:5432/todo
     username: postgres
     password: root
+    pool:
+      initial-size: 32
+      max-size: 128
   data:
     redis:
       host: localhost
