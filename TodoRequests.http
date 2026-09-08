@@ -1,0 +1,25 @@
+### GET request to example server
+POST localhost:8080/todos
+Content-Type: application/json
+
+{
+  "title": "123"
+}
+###
+
+GET localhost:8080/todos
+###
+GET localhost:8080/todos/d0bfb38f-39b8-4540-b117-3990cd745ef7
+
+###
+
+PUT localhost:8080/todos/65dbd410-9e95-48b4-91bf-b1aa7d57f9bf
+Content-Type: application/json
+
+{
+  "title": "something",
+  "completed": true
+}
+###
+
+DELETE localhost:8080/todos/79f0f7a7-bb9d-4f4a-962c-b5bc2533cf4e
